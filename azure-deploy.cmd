@@ -92,7 +92,12 @@ call !NPM_CMD! install --production
 IF !ERRORLEVEL! NEQ 0 goto error
 popd
 
-:: 2. Build DocPad site
+:: 2. KuduSync
+echo Copying Files...
+call %KUDU_SYNC_CMD% -v 500 -i "posts;drafts" -f "%DEPLOYMENT_SOURCE%\out" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%"
+IF !ERRORLEVEL! NEQ 0 goto error
+
+:: 3. Build DocPad site
 echo Building DocPad site...
 pushd "%DEPLOYMENT_SOURCE%"
 rd /s /q out
@@ -100,11 +105,6 @@ IF !ERRORLEVEL! NEQ 0 goto error
 "!NODE_EXE!" .\node_modules\docpad\bin\docpad -e static generate
 IF !ERRORLEVEL! NEQ 0 goto error
 popd
-
-:: 3. KuduSync
-echo Copying Files...
-call %KUDU_SYNC_CMD% -v 500 -i "posts;drafts" -f "%DEPLOYMENT_SOURCE%\out" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%"
-IF !ERRORLEVEL! NEQ 0 goto error
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
